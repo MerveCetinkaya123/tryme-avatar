@@ -26,7 +26,7 @@ export function MeasurementSummary({ measurements }: MeasurementSummaryProps) {
         <p>Chest: {measurements.chest} cm</p>
         <p>Waist: {measurements.waist} cm</p>
         <p>Hip: {measurements.hip} cm</p>
-        <p>Shoulder: {measurements.shoulder} cm</p>
+        <p>Shoulder Circumference: {measurements.shoulder} cm</p>
       </div>
     </div>
   );

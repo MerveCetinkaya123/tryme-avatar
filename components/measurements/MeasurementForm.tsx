@@ -121,11 +121,11 @@ export function MeasurementForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="shoulder">Shoulder / Omuz</Label>
+            <Label htmlFor="shoulder">Shoulder Circumference / Omuz Çevresi</Label>
             <Input
               id="shoulder"
               type="number"
-              placeholder="38"
+              placeholder="98"
               value={shoulder}
               onChange={(event) => setShoulder(event.target.value)}
               required
