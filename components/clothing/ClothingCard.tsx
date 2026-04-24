@@ -30,7 +30,7 @@ export function ClothingCard({
 
         <div className="text-sm text-slate-600">
           <p>Category: {item.category}</p>
-          <p>Suggested size: {item.recommendedSize}</p>
+          <p>Available sizes: {item.availableSizes.join(", ")}</p>
         </div>
 
         <Button

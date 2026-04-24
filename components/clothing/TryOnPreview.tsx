@@ -9,7 +9,7 @@ import { clothingItems } from "@/lib/data/clothingData";
 import { calculateAvatarProportions } from "@/lib/helpers/avatarCalculator";
 import type { ClothingItem } from "@/types/clothing";
 import type { BodyMeasurement } from "@/types/measurement";
-
+import { getRecommendedSize } from "@/lib/helpers/sizeRecommendation";
 const STORAGE_KEY = "tryme-body-measurements";
 
 export function TryOnPreview() {
@@ -49,6 +49,10 @@ export function TryOnPreview() {
   }
 
   const proportions = calculateAvatarProportions(measurements);
+  const recommendedSize = getRecommendedSize(
+  measurements,
+  selectedItem.category
+);
 
   const showTop =
     selectedItem.category === "top" || selectedItem.category === "dress";
@@ -150,7 +154,7 @@ export function TryOnPreview() {
             <div className="rounded-2xl bg-slate-50 p-4">
               <p className="text-sm text-slate-500">Recommended size</p>
               <p className="text-lg font-semibold text-slate-950">
-                {selectedItem.recommendedSize}
+                {recommendedSize}
               </p>
             </div>
 

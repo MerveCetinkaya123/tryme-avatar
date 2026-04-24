@@ -9,5 +9,4 @@ export type ClothingItem = {
   description: string;
   colorHex: string;
   availableSizes: ClothingSize[];
-  recommendedSize: ClothingSize;
 };

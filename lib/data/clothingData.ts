@@ -8,7 +8,6 @@ export const clothingItems: ClothingItem[] = [
     description: "A simple fitted top for daily outfits.",
     colorHex: "#111827",
     availableSizes: ["XS", "S", "M", "L"],
-    recommendedSize: "S",
   },
   {
     id: "milla-summer-dress",
@@ -17,7 +16,6 @@ export const clothingItems: ClothingItem[] = [
     description: "A midi dress preview for avatar-based try-on.",
     colorHex: "#7c3aed",
     availableSizes: ["S", "M", "L", "XL"],
-    recommendedSize: "M",
   },
   {
     id: "milla-wide-leg-pants",
@@ -26,6 +24,5 @@ export const clothingItems: ClothingItem[] = [
     description: "Comfortable pants for lower-body fit preview.",
     colorHex: "#475569",
     availableSizes: ["XS", "S", "M", "L", "XL"],
-    recommendedSize: "M",
   },
 ];
