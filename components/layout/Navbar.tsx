@@ -26,6 +26,9 @@ export function Navbar() {
           <Link href="/login" className="hover:text-slate-900">
             Login
           </Link>
+          <Link href="/brand-panel" className="hover:text-slate-900">
+            Brand Panel
+          </Link>
         </nav>
 
         <Button asChild>

@@ -28,10 +28,10 @@ export function LoginForm() {
 
     localStorage.setItem("tryme-current-user", JSON.stringify(demoUser));
 
-   if (role === "customer") {
+ if (role === "customer") {
   router.push("/measurements");
 } else {
-  router.push("/");
+  router.push("/brand-panel");
 }
   }
 
