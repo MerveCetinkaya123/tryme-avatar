@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -47,10 +48,13 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button size="lg">Create My Avatar</Button>
-            <Button size="lg" variant="outline">
-              Explore Brand Demo
-            </Button>
+           <Button asChild size="lg">
+  <Link href="/measurements">Create My Avatar</Link>
+</Button>
+
+<Button asChild size="lg" variant="outline">
+  <Link href="/try-on">Explore Try-On Demo</Link>
+</Button>
           </div>
         </div>
 

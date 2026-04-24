@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
 import type { BodyMeasurement } from "@/types/measurement";
 
 type MeasurementSummaryProps = {
@@ -27,6 +30,16 @@ export function MeasurementSummary({ measurements }: MeasurementSummaryProps) {
         <p>Waist: {measurements.waist} cm</p>
         <p>Hip: {measurements.hip} cm</p>
         <p>Shoulder Circumference: {measurements.shoulder} cm</p>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <Button asChild>
+          <Link href="/avatar">View My Avatar</Link>
+        </Button>
+
+        <Button asChild variant="outline">
+          <Link href="/try-on">Go to Try-On</Link>
+        </Button>
       </div>
     </div>
   );

@@ -96,15 +96,19 @@ export function AvatarPreview() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button asChild>
-            <Link href="/measurements">Update Measurements</Link>
-          </Button>
+       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+  <Button asChild>
+    <Link href="/try-on">Try Clothes</Link>
+  </Button>
 
-          <Button asChild variant="outline">
-            <Link href="/">Back to Homepage</Link>
-          </Button>
-        </div>
+  <Button asChild variant="outline">
+    <Link href="/measurements">Update Measurements</Link>
+  </Button>
+
+  <Button asChild variant="outline">
+    <Link href="/">Back to Homepage</Link>
+  </Button>
+</div>
       </div>
     </div>
   );

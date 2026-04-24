@@ -28,7 +28,11 @@ export function LoginForm() {
 
     localStorage.setItem("tryme-current-user", JSON.stringify(demoUser));
 
-    router.push("/");
+   if (role === "customer") {
+  router.push("/measurements");
+} else {
+  router.push("/");
+}
   }
 
   return (
