@@ -29,9 +29,9 @@ export default function Avatar3DPage() {
               </h1>
 
               <p className="max-w-xl text-base leading-7 text-slate-600">
-                This page introduces the first 3D avatar foundation. The current
-                model is a professional placeholder that will later be replaced
-                with a realistic GLB avatar and connected to body measurements.
+               This page introduces the first realistic GLB avatar integration.
+               The current model is a base human avatar that will later be refined
+               with body measurements and optional photo-assisted analysis.
               </p>
             </div>
 
@@ -47,10 +47,10 @@ export default function Avatar3DPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Model ready</CardTitle>
-                  <CardDescription>
-                    The structure is ready for realistic GLB avatar integration.
-                  </CardDescription>
+                  <CardTitle className="text-base">GLB model integrated</CardTitle>
+<CardDescription>
+  The scene now loads a realistic base avatar model.
+</CardDescription>
                 </CardHeader>
               </Card>
             </div>

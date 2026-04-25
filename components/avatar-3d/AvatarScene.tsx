@@ -1,8 +1,8 @@
 "use client";
 
-import { ContactShadows, Environment, Float, OrbitControls } from "@react-three/drei";
+import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
 
-import { ProfessionalAvatarPlaceholder } from "@/components/avatar-3d/ProfessionalAvatarPlaceholder";
+import { AvatarModel } from "@/components/avatar-3d/AvatarModel";
 
 export function AvatarScene() {
   return (
@@ -10,6 +10,7 @@ export function AvatarScene() {
       <color attach="background" args={["#f8fafc"]} />
 
       <ambientLight intensity={0.8} />
+
       <directionalLight
         position={[3, 5, 4]}
         intensity={2.2}
@@ -17,6 +18,7 @@ export function AvatarScene() {
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
       />
+
       <spotLight
         position={[-4, 5, 2]}
         intensity={1.2}
@@ -25,9 +27,7 @@ export function AvatarScene() {
         castShadow
       />
 
-      <Float speed={1.2} rotationIntensity={0.08} floatIntensity={0.15}>
-        <ProfessionalAvatarPlaceholder />
-      </Float>
+      <AvatarModel />
 
       <ContactShadows
         position={[0, -1.25, 0]}
@@ -41,7 +41,7 @@ export function AvatarScene() {
 
       <OrbitControls
         enablePan={false}
-        minDistance={3}
+        minDistance={2.5}
         maxDistance={6}
         minPolarAngle={Math.PI / 4}
         maxPolarAngle={Math.PI / 1.8}
