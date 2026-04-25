@@ -5,11 +5,25 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ClothingCategory, ClothingItem, ClothingSize } from "@/types/clothing";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import type {
+  ClothingCategory,
+  ClothingItem,
+  ClothingSize,
+} from "@/types/clothing";
 
 type ProductFormProps = {
   onAddProduct: (product: ClothingItem) => void;
 };
+
+const validSizes: ClothingSize[] = ["XS", "S", "M", "L", "XL"];
 
 export function ProductForm({ onAddProduct }: ProductFormProps) {
   const [name, setName] = useState("");
@@ -24,13 +38,19 @@ export function ProductForm({ onAddProduct }: ProductFormProps) {
     const availableSizes = sizes
       .split(",")
       .map((size) => size.trim().toUpperCase())
-      .filter(Boolean) as ClothingSize[];
+      .filter((size): size is ClothingSize =>
+        validSizes.includes(size as ClothingSize)
+      );
+
+    if (!name.trim() || !description.trim() || availableSizes.length === 0) {
+      return;
+    }
 
     const newProduct: ClothingItem = {
       id: `brand-product-${Date.now()}`,
-      name,
+      name: name.trim(),
       category,
-      description,
+      description: description.trim(),
       colorHex,
       availableSizes,
     };
@@ -60,23 +80,26 @@ export function ProductForm({ onAddProduct }: ProductFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="category">Category</Label>
-        <select
-          id="category"
+        <Select
           value={category}
-          onChange={(event) => setCategory(event.target.value as ClothingCategory)}
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+          onValueChange={(value) => setCategory(value as ClothingCategory)}
         >
-          <option value="top">Top</option>
-          <option value="dress">Dress</option>
-          <option value="bottom">Bottom</option>
-        </select>
+          <SelectTrigger id="category" className="w-full">
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="top">Top</SelectItem>
+            <SelectItem value="dress">Dress</SelectItem>
+            <SelectItem value="bottom">Bottom</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="description">Description</Label>
-        <Input
+        <Textarea
           id="description"
-          type="text"
           placeholder="A product prepared for virtual try-on preview."
           value={description}
           onChange={(event) => setDescription(event.target.value)}
@@ -84,33 +107,36 @@ export function ProductForm({ onAddProduct }: ProductFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="colorHex">Product color</Label>
-        <Input
-          id="colorHex"
-          type="color"
-          value={colorHex}
-          onChange={(event) => setColorHex(event.target.value)}
-        />
-      </div>
+      <div className="grid gap-5 sm:grid-cols-[0.7fr_1.3fr]">
+        <div className="space-y-2">
+          <Label htmlFor="colorHex">Product color</Label>
+          <Input
+            id="colorHex"
+            type="color"
+            value={colorHex}
+            onChange={(event) => setColorHex(event.target.value)}
+            className="h-11 cursor-pointer p-1"
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="sizes">Available sizes</Label>
-        <Input
-          id="sizes"
-          type="text"
-          placeholder="XS,S,M,L,XL"
-          value={sizes}
-          onChange={(event) => setSizes(event.target.value)}
-          required
-        />
-        <p className="text-xs text-slate-500">
-          Write sizes separated by commas. Example: XS,S,M,L,XL
-        </p>
+        <div className="space-y-2">
+          <Label htmlFor="sizes">Available sizes</Label>
+          <Input
+            id="sizes"
+            type="text"
+            placeholder="XS,S,M,L,XL"
+            value={sizes}
+            onChange={(event) => setSizes(event.target.value)}
+            required
+          />
+          <p className="text-xs text-slate-500">
+            Write sizes separated by commas. Example: XS,S,M,L,XL
+          </p>
+        </div>
       </div>
 
       <Button type="submit" className="w-full">
-        Add Product
+        Add product
       </Button>
     </form>
   );

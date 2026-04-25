@@ -5,8 +5,16 @@ import { useEffect, useState } from "react";
 
 import { ProductForm } from "@/components/brand/ProductForm";
 import { ProductTable } from "@/components/brand/ProductTable";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { clothingItems } from "@/lib/data/clothingData";
 import type { ClothingItem } from "@/types/clothing";
 
@@ -36,41 +44,57 @@ export default function BrandPanelPage() {
     setProducts([...clothingItems, ...updatedStoredProducts]);
   }
 
+  const customProductCount = Math.max(products.length - clothingItems.length, 0);
+
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-12">
-      <div className="mx-auto max-w-6xl">
-        <Link href="/" className="text-sm text-slate-500 hover:text-slate-900">
-          ← Back to homepage
-        </Link>
+      <div className="mx-auto max-w-6xl space-y-8">
+        <Button asChild variant="ghost" className="px-0 text-slate-600">
+          <Link href="/">Back to home</Link>
+        </Button>
 
-        <div className="mt-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Brand panel
-            </p>
+        <section className="rounded-3xl border bg-white p-8 shadow-sm">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-2xl space-y-3">
+              <Badge variant="secondary">Brand Dashboard</Badge>
 
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">
-              Manage virtual try-on products
-            </h1>
+              <h1 className="text-3xl font-bold tracking-tight text-slate-950 md:text-4xl">
+                Manage your TryMe Avatar products
+              </h1>
 
-            <p className="mt-4 max-w-2xl text-slate-600">
-              This prototype panel allows fashion brands to add demo clothing
-              items and prepare them for TryMe Avatar virtual try-on previews.
-            </p>
-          </div>
-
-          <Button asChild variant="outline">
-            <Link href="/try-on">View Try-On Page</Link>
-          </Button>
-        </div>
-
-        <div className="mt-10 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <Card>
-            <CardHeader>
-              <CardTitle>Add demo product</CardTitle>
-              <p className="text-sm text-slate-500">
-                Add a product to test how brand inventory can be managed.
+              <p className="text-base text-slate-600">
+                Add clothing products, review your product list, and prepare
+                brand-side items for the customer try-on experience.
               </p>
+            </div>
+
+          <div className="grid w-full gap-3 sm:grid-cols-2 lg:w-[360px]">
+  <Card className="min-w-[160px]">
+    <CardHeader className="pb-2">
+      <CardDescription>Total products</CardDescription>
+      <CardTitle className="text-3xl">{products.length}</CardTitle>
+    </CardHeader>
+  </Card>
+
+  <Card className="min-w-[160px]">
+    <CardHeader className="pb-2">
+      <CardDescription>Brand products</CardDescription>
+      <CardTitle className="text-3xl">{customProductCount}</CardTitle>
+    </CardHeader>
+  </Card>
+</div>
+          </div>
+        </section>
+
+        <Separator />
+
+        <section className="grid gap-6 lg:grid-cols-[0.9fr_1.4fr]">
+          <Card className="h-fit">
+            <CardHeader>
+              <CardTitle>Add new product</CardTitle>
+              <CardDescription>
+                Create a demo clothing item for the brand panel.
+              </CardDescription>
             </CardHeader>
 
             <CardContent>
@@ -78,14 +102,19 @@ export default function BrandPanelPage() {
             </CardContent>
           </Card>
 
-          <div>
-            <h2 className="mb-5 text-2xl font-bold text-slate-950">
-              Product list
-            </h2>
+          <Card>
+            <CardHeader>
+              <CardTitle>Product inventory</CardTitle>
+              <CardDescription>
+                View default demo items and products added by the brand.
+              </CardDescription>
+            </CardHeader>
 
-            <ProductTable products={products} />
-          </div>
-        </div>
+            <CardContent>
+              <ProductTable products={products} />
+            </CardContent>
+          </Card>
+        </section>
       </div>
     </main>
   );
