@@ -16,32 +16,96 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { clothingItems } from "@/lib/data/clothingData";
-import type { ClothingItem } from "@/types/clothing";
+import { supabase } from "@/lib/supabase/client";
+import type {
+  ClothingCategory,
+  ClothingItem,
+  ClothingSize,
+} from "@/types/clothing";
 
-const STORAGE_KEY = "tryme-brand-products";
+type SupabaseBrandProduct = {
+  id: string;
+  name: string;
+  category: ClothingCategory;
+  description: string;
+  color_hex: string;
+  available_sizes: ClothingSize[];
+  image_url: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+function mapSupabaseProduct(product: SupabaseBrandProduct): ClothingItem {
+  return {
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    description: product.description,
+    colorHex: product.color_hex,
+    availableSizes: product.available_sizes,
+  };
+}
 
 export default function BrandPanelPage() {
   const [products, setProducts] = useState<ClothingItem[]>(clothingItems);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedProducts = localStorage.getItem(STORAGE_KEY);
+    async function fetchBrandProducts() {
+      setIsLoading(true);
+      setErrorMessage(null);
 
-    if (storedProducts) {
-      const parsedProducts = JSON.parse(storedProducts) as ClothingItem[];
-      setProducts([...clothingItems, ...parsedProducts]);
+      const { data, error } = await supabase
+        .from("brand_products")
+        .select(
+          "id, name, category, description, color_hex, available_sizes, image_url, created_at, updated_at"
+        )
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        setErrorMessage("Brand products could not be loaded from Supabase.");
+        setProducts(clothingItems);
+        setIsLoading(false);
+        return;
+      }
+
+      const supabaseProducts = (data ?? []).map((product) =>
+        mapSupabaseProduct(product as SupabaseBrandProduct)
+      );
+
+      setProducts([...clothingItems, ...supabaseProducts]);
+      setIsLoading(false);
     }
+
+    fetchBrandProducts();
   }, []);
 
-  function handleAddProduct(product: ClothingItem) {
-    const existingStoredProducts = localStorage.getItem(STORAGE_KEY);
-    const parsedStoredProducts = existingStoredProducts
-      ? (JSON.parse(existingStoredProducts) as ClothingItem[])
-      : [];
+  async function handleAddProduct(product: ClothingItem) {
+    setErrorMessage(null);
 
-    const updatedStoredProducts = [...parsedStoredProducts, product];
+    const { data, error } = await supabase
+      .from("brand_products")
+      .insert({
+        name: product.name,
+        category: product.category,
+        description: product.description,
+        color_hex: product.colorHex,
+        available_sizes: product.availableSizes,
+        image_url: null,
+      })
+      .select(
+        "id, name, category, description, color_hex, available_sizes, image_url, created_at, updated_at"
+      )
+      .single();
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedStoredProducts));
-    setProducts([...clothingItems, ...updatedStoredProducts]);
+    if (error) {
+      setErrorMessage("Product could not be saved to Supabase.");
+      return;
+    }
+
+    const newProduct = mapSupabaseProduct(data as SupabaseBrandProduct);
+    setProducts((currentProducts) => [...currentProducts, newProduct]);
   }
 
   const customProductCount = Math.max(products.length - clothingItems.length, 0);
@@ -68,32 +132,40 @@ export default function BrandPanelPage() {
               </p>
             </div>
 
-          <div className="grid w-full gap-3 sm:grid-cols-2 lg:w-[360px]">
-  <Card className="min-w-[160px]">
-    <CardHeader className="pb-2">
-      <CardDescription>Total products</CardDescription>
-      <CardTitle className="text-3xl">{products.length}</CardTitle>
-    </CardHeader>
-  </Card>
+            <div className="grid w-full gap-3 sm:grid-cols-2 lg:w-[360px]">
+              <Card className="min-w-[160px]">
+                <CardHeader className="pb-2">
+                  <CardDescription>Total products</CardDescription>
+                  <CardTitle className="text-3xl">{products.length}</CardTitle>
+                </CardHeader>
+              </Card>
 
-  <Card className="min-w-[160px]">
-    <CardHeader className="pb-2">
-      <CardDescription>Brand products</CardDescription>
-      <CardTitle className="text-3xl">{customProductCount}</CardTitle>
-    </CardHeader>
-  </Card>
-</div>
+              <Card className="min-w-[160px]">
+                <CardHeader className="pb-2">
+                  <CardDescription>Supabase products</CardDescription>
+                  <CardTitle className="text-3xl">
+                    {customProductCount}
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+            </div>
           </div>
         </section>
 
         <Separator />
+
+        {errorMessage ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        ) : null}
 
         <section className="grid gap-6 lg:grid-cols-[0.9fr_1.4fr]">
           <Card className="h-fit">
             <CardHeader>
               <CardTitle>Add new product</CardTitle>
               <CardDescription>
-                Create a demo clothing item for the brand panel.
+                Create a clothing item and save it to Supabase.
               </CardDescription>
             </CardHeader>
 
@@ -106,12 +178,18 @@ export default function BrandPanelPage() {
             <CardHeader>
               <CardTitle>Product inventory</CardTitle>
               <CardDescription>
-                View default demo items and products added by the brand.
+                View default demo items and products loaded from Supabase.
               </CardDescription>
             </CardHeader>
 
             <CardContent>
-              <ProductTable products={products} />
+              {isLoading ? (
+                <div className="rounded-2xl border border-dashed p-8 text-center text-sm text-slate-500">
+                  Loading products from Supabase...
+                </div>
+              ) : (
+                <ProductTable products={products} />
+              )}
             </CardContent>
           </Card>
         </section>
