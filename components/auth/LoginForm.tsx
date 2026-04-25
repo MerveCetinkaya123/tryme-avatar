@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 
+import { loginUser } from "@/app/auth/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,46 +16,50 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-
-type UserRole = "customer" | "brand";
-
-const roleDescriptions: Record<UserRole, string> = {
-  customer:
-    "Continue to measurements, avatar preview and virtual try-on pages.",
-  brand: "Continue to the brand dashboard and manage Supabase products.",
-};
 
 export function LoginForm() {
   const router = useRouter();
 
+  const [isPending, startTransition] = useTransition();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("customer");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const demoUser = {
-      email: email.trim(),
-      role,
-      name: email.split("@")[0],
-    };
+    setErrorMessage(null);
 
-    localStorage.setItem("tryme-current-user", JSON.stringify(demoUser));
+    startTransition(() => {
+      void loginUser({
+        email,
+        password,
+      }).then((result) => {
+        if (!result.success) {
+          setErrorMessage(result.error);
+          return;
+        }
 
-    if (role === "customer") {
-      router.push("/measurements");
-    } else {
-      router.push("/brand-panel");
-    }
+        localStorage.setItem(
+          "tryme-current-user",
+          JSON.stringify({
+            email: result.email,
+            role: result.role,
+            name: result.name,
+          })
+        );
+
+        if (result.role === "brand") {
+          router.push("/brand-panel");
+        } else {
+          router.push("/measurements");
+        }
+
+        router.refresh();
+      });
+    });
   }
 
   return (
@@ -65,7 +70,7 @@ export function LoginForm() {
             TA
           </div>
 
-          <Badge variant="outline">Demo login</Badge>
+          <Badge variant="outline">Supabase login</Badge>
         </div>
 
         <div className="space-y-2">
@@ -74,13 +79,19 @@ export function LoginForm() {
           </CardTitle>
 
           <CardDescription>
-            Choose your role and continue with the current demo flow.
+            Log in with your Supabase account and continue based on your role.
           </CardDescription>
         </div>
       </CardHeader>
 
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
+          {errorMessage ? (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
+
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
             <Input
@@ -89,6 +100,7 @@ export function LoginForm() {
               placeholder="merve@example.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              disabled={isPending}
               required
             />
           </div>
@@ -101,34 +113,13 @@ export function LoginForm() {
               placeholder="Enter your password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              disabled={isPending}
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="role">Login type</Label>
-
-            <Select
-              value={role}
-              onValueChange={(value) => setRole(value as UserRole)}
-            >
-              <SelectTrigger id="role" className="w-full">
-                <SelectValue placeholder="Select login type" />
-              </SelectTrigger>
-
-              <SelectContent>
-                <SelectItem value="customer">Customer</SelectItem>
-                <SelectItem value="brand">Brand</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <p className="text-xs leading-5 text-slate-500">
-              {roleDescriptions[role]}
-            </p>
-          </div>
-
-          <Button type="submit" className="w-full">
-            Continue
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending ? "Logging in..." : "Continue"}
           </Button>
 
           <Separator />

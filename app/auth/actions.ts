@@ -11,6 +11,23 @@ type RegisterInput = {
   role: UserRole;
 };
 
+type LoginInput = {
+  email: string;
+  password: string;
+};
+
+type AuthActionResult =
+  | {
+      success: true;
+      role: UserRole;
+      email: string;
+      name: string;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
 export async function registerUser(input: RegisterInput) {
   const supabase = await createClient();
 
@@ -60,5 +77,45 @@ export async function registerUser(input: RegisterInput) {
 
   return {
     success: true,
+  };
+}
+
+export async function loginUser(input: LoginInput): Promise<AuthActionResult> {
+  const supabase = await createClient();
+
+  const email = input.email.trim().toLowerCase();
+  const password = input.password;
+
+  if (!email || !password) {
+    return {
+      success: false,
+      error: "Please enter your email and password.",
+    };
+  }
+
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error || !data.user) {
+    return {
+      success: false,
+      error: error?.message ?? "Login failed. Please try again.",
+    };
+  }
+
+  const metadata = data.user.user_metadata;
+  const role = metadata.role === "brand" ? "brand" : "customer";
+  const name =
+    typeof metadata.full_name === "string" && metadata.full_name.length > 0
+      ? metadata.full_name
+      : email.split("@")[0];
+
+  return {
+    success: true,
+    role,
+    email,
+    name,
   };
 }
