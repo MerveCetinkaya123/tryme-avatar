@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 
+import { registerUser } from "@/app/auth/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,24 +37,31 @@ const roleDescriptions: Record<UserRole, string> = {
 export function RegisterForm() {
   const router = useRouter();
 
+  const [isPending, startTransition] = useTransition();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<UserRole>("customer");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const newUser = {
-      fullName: fullName.trim(),
-      email: email.trim(),
-      password,
-      role,
-    };
+    setErrorMessage(null);
 
-    localStorage.setItem("tryme-registered-user", JSON.stringify(newUser));
+    startTransition(() => {
+      void registerUser({
+        fullName,
+        email,
+        password,
+        role,
+      }).then((result) => {
+        
 
-    router.push("/login");
+        router.push("/login");
+      });
+    });
   }
 
   return (
@@ -64,7 +72,7 @@ export function RegisterForm() {
             TA
           </div>
 
-          <Badge variant="outline">Demo register</Badge>
+          <Badge variant="outline">Supabase register</Badge>
         </div>
 
         <div className="space-y-2">
@@ -73,14 +81,20 @@ export function RegisterForm() {
           </CardTitle>
 
           <CardDescription>
-            Choose your account type and continue with the current demo
-            registration flow.
+            Create your account with Supabase Auth and continue with the TryMe
+            Avatar flow.
           </CardDescription>
         </div>
       </CardHeader>
 
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-5">
+          {errorMessage ? (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
+
           <div className="space-y-2">
             <Label htmlFor="fullName">Full name</Label>
             <Input
@@ -89,6 +103,7 @@ export function RegisterForm() {
               placeholder="Merve Cetinkaya"
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
+              disabled={isPending}
               required
             />
           </div>
@@ -101,6 +116,7 @@ export function RegisterForm() {
               placeholder="merve@example.com"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
+              disabled={isPending}
               required
             />
           </div>
@@ -113,6 +129,7 @@ export function RegisterForm() {
               placeholder="Create a password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
+              disabled={isPending}
               minLength={6}
               required
             />
@@ -124,6 +141,7 @@ export function RegisterForm() {
             <Select
               value={role}
               onValueChange={(value) => setRole(value as UserRole)}
+              disabled={isPending}
             >
               <SelectTrigger id="role" className="w-full">
                 <SelectValue placeholder="Select account type" />
@@ -140,8 +158,8 @@ export function RegisterForm() {
             </p>
           </div>
 
-          <Button type="submit" className="w-full">
-            Create account
+          <Button type="submit" className="w-full" disabled={isPending}>
+            {isPending ? "Creating account..." : "Create account"}
           </Button>
 
           <Separator />
